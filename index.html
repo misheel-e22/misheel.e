@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE ACADEMIA | Дэлхийн Шилдэг Их Сургуулиуд</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#050505',
+                        fg: '#fafafa',
+                        muted: '#71717a',
+                        accent: '#D4AF37',
+                        card: 'rgba(255, 255, 255, 0.03)',
+                        border: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    fontFamily: {
+                        display: ['Playfair Display', 'serif'],
+                        body: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #050505; color: #fafafa; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 3px; }
+
+        /* Prism Text Effect */
+        .prism-text {
+            background: linear-gradient(90deg, #fff, #D4AF37, #fff, #D4AF37, #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+
+        /* Fluid Glass Card */
+        .fluid-glass {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .fluid-glass::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
+            animation: fluidMove 20s infinite linear;
+            pointer-events: none;
+        }
+
+        /* Reflective Card Effect */
+        .reflective-card {
+            position: relative;
+            background: #111;
+            border: 1px solid #222;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .reflective-card::after {
+            content: '';
+            position: absolute;
+            top: -100%; left: -100%;
+            width: 50%; height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: rotate(25deg);
+            transition: all 0.6s;
+            pointer-events: none;
+        }
+        .reflective-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+        .reflective-card:hover::after { left: 150%; }
+
+        /* Dock Navigation */
+        .dock-nav {
+            background: rgba(10, 10, 10, 0.8);
+           
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+           
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            transform: scale(0.9);
+            transition: all 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        /* Animations */
+        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes fluidMove { 
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(10%, 10%); }
+            100% { transform: translate(0, 0); }
+        }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        /* Custom Scrollbar for Modal */
+        .modal-content::-webkit-scrollbar { width: 4px; }
+        .modal-content::-webkit-scrollbar-thumb { background: #D4AF37; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 z-0 opacity-20 pointer-events-none">
+        <div class="absolute top-0 left-0 w-2/3 h-2/3 bg-gradient-to-br from-purple-900 to-transparent rounded-full filter blur-[120px] mix-blend-screen"></div>
+        <div class="absolute bottom-0 right-0 w-2/3 h-2/3 bg-gradient-to-tl from-amber-900 to-transparent rounded-full filter blur-[120px] mix-blend-screen"></div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 p-4">
+        <nav class="max-w-6xl mx-auto dock-nav px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-accent to-white flex items-center justify-center text-bg font-bold text-sm">E</div>
+                <span class="font-display text-lg tracking-widest text-white">ELITE</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-xs font-light tracking-wider uppercase text-muted">
+                <a href="#universities" class="hover:text-accent transition-colors">Сургууль</a>
+                <a href="#info" class="hover:text-accent transition-colors">Мэдээлэл</a>
+            </div>
+            <button onclick="toggleAuthModal(true)" class="bg-accent text-bg text-xs font-semibold px-5 py-2 rounded-full hover:bg-white transition-colors">
+                Нэвтрэх
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="h-screen flex items-center justify-center text-center relative px-6">
+        <div class="max-w-4xl mx-auto z-10">
+            <h1 class="font-display text-6xl md:text-8xl font-bold leading-tight mb-6">
+                <span class="block text-white">ИРЭЭДҮЙГЭЭ</span>
+                <span class="block prism-text mt-2">бүтээцгээе
+                </span>
+            </h1>
+            <div class="w-24 h-px bg-accent mx-auto my-8"></div>
+            <p class="text-muted max-w-xl mx-auto mb-12 leading-relaxed">
+                Дэлхийн шилдэг сургуулиудын нууц. Тухайн сургуульд зориулсан бодит эссэ жишээ, элсэлтийн магадлал тооцоолуур.
+            </p>
+            <a href="#universities" class="inline-block border border-accent text-accent px-8 py-3 rounded-full hover:bg-accent hover:text-bg transition-all duration-500 text-sm tracking-widest">
+                СУРГУУЛИА СОНГОХ
+            </a>
+        </div>
+    </section>
+
+    <!-- Universities Grid Section -->
+    <section id="universities" class="py-32 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20 reveal">
+                <h2 class="font-display text-5xl mb-4 text-white">Дэлхийн Шилдэг Сургуулиуд</h2>
+                <p class="text-muted">Тухайн сургуулийн эссэг сонирхохын тулд дарна уу.</p>
+            </div>
+
+            <div id="uni-grid" class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Cards populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-border/20">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-muted text-xs">2024 Elite Academia. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- University Detail Modal (Essay + Info) -->
+    <div id="uni-modal" class="modal-overlay">
+        <div class="modal-content fluid-glass rounded-2xl max-w-4xl w-full mx-4 relative border border-border">
+            <button onclick="toggleUniModal(false)" class="absolute top-4 right-4 text-muted hover:text-white z-10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            
+            <div class="p-8 md:p-12 space-y-8">
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row gap-6 border-b border-border pb-8">
+                    <div class="w-24 h-24 bg-black/50 rounded-lg flex items-center justify-center text-accent border border-border" id="modal-logo"></div>
+                    <div>
+                        <h3 class="font-display text-3xl text-white" id="modal-name"></h3>
+                        <p class="text-muted mt-1" id="modal-location"></p>
+                        <div class="flex gap-2 mt-3">
+                            <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded" id="modal-rank"></span>
+                            <span class="px-2 py-1 bg-white/10 text-white text-xs rounded" id="modal-acceptance"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid md:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-black/30 p-4 rounded-lg border border-border/50">
+                        <div class="text-muted text-xs uppercase mb-1">Байршил / Улс</div>
+                        <div class="text-white font-medium" id="modal-country"></div>
+                    </div>
+                    <div class="bg-black/30 p-4 rounded-lg border border-border/50">
+                        <div class="text-muted text-xs uppercase mb-1">Шаардлагатай GPA</div>
+                        <div class="text-white font-medium" id="modal-gpa"></div>
+                    </div>
+                    <div class="bg-black/30 p-4 rounded-lg border border-border/50">
+                        <div class="text-muted text-xs uppercase mb-1">SAT Дундаж</div>
+                        <div class="text-white font-medium" id="modal-sat"></div>
+                    </div>
+                </div>
+
+                <!-- Essay Section -->
+                <div>
+                    <h4 class="font-display text-xl text-accent mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Амжилттай Эссэний Жишээ (Excerpt)
+                    </h4>
+                    <div class="bg-black/50 p-6 rounded-lg border-l-4 border-accent text-sm text-gray-300 leading-relaxed italic space-y-4" id="modal-essay">
+                        <!-- Essay text injected here -->
+                    </div>
+                    <p class="text-right text-xs text-muted mt-2">Энэхүү эссэ нь тухайн сургуульд элссэн оюутны бодит эссэний хураангуй юм.</p>
+                </div>
+
+                <!-- Calculator Section -->
+                <div class="bg-black/20 p-6 rounded-lg border border-border/50">
+                    <h4 class="font-display text-lg text-white mb-4">Элсэх Магадлал Тооцоолох</h4>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <input type="number" id="calc-input-gpa" placeholder="Таны GPA" step="0.1" class="bg-black/50 border border-border p-3 rounded text-white text-sm focus:border-accent outline-none">
+                        <input type="number" id="calc-input-sat" placeholder="Таны SAT" class="bg-black/50 border border-border p-3 rounded text-white text-sm focus:border-accent outline-none">
+                    </div>
+                    <button onclick="calculateModalChance()" class="w-full bg-accent text-bg font-bold py-2 rounded hover:bg-white transition-colors text-sm">
+                        Тооцоолох
+                    </button>
+                    <div id="modal-result" class="hidden mt-4 text-center p-4 border border-accent bg-accent/10 rounded">
+                        <span class="text-sm text-muted">Таны элсэх магадлал:</span>
+                        <div class="text-3xl font-display text-accent mt-1" id="modal-result-text">0%</div>
+                    </div>
+                </div>
+
+                <!-- Majors -->
+                <div>
+                    <h4 class="font-display text-lg text-white mb-3">Түгээмэл Мэргэжилүүд</h4>
+                    <div class="flex flex-wrap gap-2" id="modal-majors"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content fluid-glass rounded-2xl p-10 max-w-md w-full mx-4 relative">
+            <button onclick="toggleAuthModal(false)" class="absolute top-4 right-4 text-muted hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            
+            <h3 class="font-display text-3xl text-white mb-2">Нэвтрэх</h3>
+            <p class="text-muted text-sm mb-8">Имэйл хаягаа оруулж дэлгэрэнгүй мэдээлэл, зөвлөгөө аваарай.</p>
+
+            <form onsubmit="handleAuth(event)" class="space-y-4">
+                <input type="email" placeholder="Имэйл хаяг" required class="w-full bg-black/50 border border-border p-3 rounded-lg text-white focus:border-accent outline-none">
+                <input type="password" placeholder="Нууц үг (хоосон орхиж болно)" class="w-full bg-black/50 border border-border p-3 rounded-lg text-white focus:border-accent outline-none">
+                
+                <button type="submit" class="w-full bg-accent text-bg font-bold py-3 rounded-lg hover:bg-white transition-colors text-sm">
+                    ИЛГЭЭХ
+                </button>
+            </form>
+            
+            <div id="auth-success" class="hidden text-center pt-6">
+                <div class="text-green-400 text-4xl mb-2">✓</div>
+                <p class="text-white font-medium">Амжилттай!</p>
+                <p class="text-muted text-sm mt-1">Таны имэйл рүү дэлгэрэнгүй мэдээлэл илгээлээ.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // University Data (20 Universities)
+        const universities = [
+            {
+                name: 'Harvard University',
+                location: 'Cambridge, MA',
+                country: 'АНУ',
+                rank: 1,
+                acceptance: '3.4%',
+                gpaReq: '3.9+',
+                satAvg: '1520',
+                majors: ['Хууль', 'Эдийн засаг', 'Биохими', 'Улс төр'],
+                essayTitle: 'Intellectual Experience',
+                essay: `Allen Xu is a junior at Naperville North High School, passionate about economics, policy, and social innovation. His interest in environmental economics began through congressional debate, where he competed in tournaments nationwide—including at Harvard—on topics like subsidies and carbon taxes. These conversations sparked a curiosity that led him to conduct research at the University of Michigan and Purdue University Fort Wayne, publishing a paper linking government-induced economic failures and democratic backsliding to carbon emissions. Eventually, these experiences inspired his essay for this year’s contest! Believing advocacy and policy alone cannot fully address challenges like climate change, Allen spends much of his time bridging economics with entrepreneurship.
+
+He runs businesses focused on accessibility for visually impaired athletes and educational technology, and leads a nonprofit organization equipping young entrepreneurs with business education through free camps and “Fish Tank” competitions.`,
+                color: '#A51C30'
+            },
+            {
+                name: 'Stanford University',
+                location: 'Stanford, CA',
+                country: 'АНУ',
+                rank: 2,
+                acceptance: '3.7%',
+                gpaReq: '3.95+',
+                satAvg: '1500',
+                majors: ['Компьютерийн ухаан', 'Инженерчлэл', 'Бизнес', 'Биологи'],
+                essayTitle: 'Letter to Roommate',
+                essay: `Dear Future Roommate, I promise to keep my side of the room relatively organized, though "organized chaos" might be a better description. You'll often find me humming jazz standards while coding late into the night—my way of debugging is apparently musical. I have a slight obsession with mechanical keyboards, so I hope you enjoy the sound of clicky keys... <br><br>But beyond the quirks, I hope we can share midnight conversations about everything from the ethics of AI to the best burger spots in Palo Alto.`,
+                color: '#8C1515'
+            },
+            {
+                name: 'MIT',
+                location: 'Cambridge, MA',
+                country: 'АНУ',
+                rank: 3,
+                acceptance: '3.9%',
+                gpaReq: '3.96+',
+                satAvg: '1540',
+                majors: ['Физик', 'Математик', 'Аэроспейс', 'Хим'],
+                essayTitle: 'World you come from',
+                essay: `My world smells of soldering iron smoke and stale coffee. It’s the backroom of my father’s electronics repair shop, where I first learned that a circuit board is a map of possibilities. When I was twelve, I found a broken radio that no one could fix. For weeks, I traced the pathways, learning the language of resistors and capacitors... <br><br>That radio never played music again, but it taught me something more valuable: resilience.`,
+                color: '#A31F34'
+            },
+            {
+                name: 'University of Cambridge',
+                location: 'Cambridge',
+                country: 'Их Британи',
+                rank: 4,
+                acceptance: '21%',
+                gpaReq: '3.7+',
+                satAvg: 'N/A',
+                majors: ['Математик', 'Физик', 'Эдийн засаг', 'Эртний түүх'],
+                essayTitle: 'Academic Interest',
+                essay: `The elegance of a mathematical proof lies not just in its conclusion, but in the journey of logic that leads there. My fascination with Number Theory began when I stumbled upon Fermat's Last Theorem during a summer program. I was captivated by how a simple statement could require centuries of mathematical development to prove... <br><br>At Cambridge, I hope to engage in the supervision system, debating and refining my understanding of complex analysis.`,
+                color: '#A3C1AD'
+            },
+            {
+                name: 'University of Oxford',
+                location: 'Oxford',
+                country: 'Их Британи',
+                rank: 5,
+                acceptance: '17.5%',
+                gpaReq: '3.7+',
+                satAvg: 'N/A',
+                majors: ['Философи', 'Улс төр судлал', 'Эдийн засаг', 'Анагаах ухаан'],
+                essayTitle: 'Personal Statement',
+                essay: `History is not merely a record of the past; it is a mirror reflecting the cyclical nature of human ambition. My interest in the Cold War era began not with textbooks, but with my grandmother’s stories of living through the geopolitical shifts in Eastern Europe. Her narrative conflicted with the official accounts, sparking my desire to uncover the "unofficial" truths...`,
+                color: '#002147'
+            },
+            {
+                name: 'Columbia University',
+                location: 'New York, NY',
+                country: 'АНУ',
+                rank: 6,
+                acceptance: '3.9%',
+                gpaReq: '3.9+',
+                satAvg: '1510',
+                majors: ['Сэтгүүл зүй', 'Урлаг', 'Бизнес', 'Олон улсын харилцаа'],
+                essayTitle: 'Why Columbia',
+                essay: `New York City is a classroom without walls. Growing up in a small rural town, the concept of a metropolis was alien to me. However, as I delved into urban studies, I realized that cities are living organisms. Columbia’s Core Curriculum offers the perfect foundation, but it is the access to the UN and Wall Street that truly draws me...`,
+                color: '#0D3B66'
+            },
+            {
+                name: 'Yale University',
+                location: 'New Haven, CT',
+                country: 'АНУ',
+                rank: 7,
+                acceptance: '4.5%',
+                gpaReq: '3.9+',
+                satAvg: '1515',
+                majors: ['Урлаг', 'Хууль', 'Анагаах ухаан', 'Драм'],
+                essayTitle: 'Community Impact',
+                essay: `I realized that leadership isn't about being in front; it's about lifting others up. Founding the community garden project taught me that real change happens slowly, one seed at a time. It required negotiating with city council, organizing volunteers, and enduring failed harvests... <br><br>Yale’s emphasis on residential colleges appeals to me because I believe some of the best learning happens over a shared meal in a communal space.`,
+                color: '#0F4D92'
+            },
+            {
+                name: 'Princeton University',
+                location: 'Princeton, NJ',
+                country: 'АНУ',
+                rank: 8,
+                acceptance: '4.0%',
+                gpaReq: '3.9+',
+                satAvg: '1520',
+                majors: ['Нийгмийн шинжлэх ухаан', 'Физик', 'Төрийн удирдлага'],
+                essayTitle: 'Service and Civic Duty',
+                essay: `The bridge between theoretical physics and public policy is shorter than most think. Both require modeling complex systems and predicting outcomes. My internship at the state legislature showed me how scientific literacy is often missing in policy debates... <br><br>Princeton’s commitment to service resonates with my belief that education should be used for the public good.`,
+                color: '#E77500'
+            },
+            {
+                name: 'ETH Zurich',
+                location: 'Zurich',
+                country: 'Швейцарь',
+                rank: 9,
+                acceptance: '27%',
+                gpaReq: '3.5+',
+                satAvg: '1400+',
+                majors: ['Инженерчлэл', 'Мэдээллийн технологи', 'Байгалийн шинжлэх ухаан'],
+                essayTitle: 'Motivation Letter',
+                essay: `Sustainability is often discussed as a constraint; I see it as an engineering challenge. Growing up near the receding glaciers, I witnessed the tangible effects of climate change. This drove me to focus my high school thesis on photovoltaic efficiency in low-light conditions... <br><br>ETH stands at the forefront of sustainable technology. I am eager to contribute to the research on carbon-neutral urban infrastructure.`,
+                color: '#1A3B6E'
+            },
+            {
+                name: 'University of Toronto',
+                location: 'Toronto',
+                country: 'Канад',
+                rank: 10,
+                acceptance: '43%',
+                gpaReq: '3.6+',
+                satAvg: 'N/A',
+                majors: ['Медицины шинжлэх ухаан', 'Хүмүүнлэг', 'Компьютерийн ухаан'],
+                essayTitle: 'Diverse Perspectives',
+                essay: `Toronto is the world in a single city. As a volunteer at a local refugee center, I saw how policy translates into human reality. The intersection of sociology and political science fascinates me... <br><br>U of T’s diverse environment will challenge my worldview and help me grow not just as a student, but as a global citizen.`,
+                color: '#002A5C'
+            },
+            {
+                name: 'National University of Singapore',
+                location: 'Singapore',
+                country: 'Сингапур',
+                rank: 11,
+                acceptance: '5%',
+                gpaReq: '3.7+',
+                satAvg: '1450',
+                majors: ['Бизнес', 'Инженерчлэл', 'Биотехнологи'],
+                essayTitle: 'Innovation in Asia',
+                essay: `Asia is the frontier of modern innovation. Witnessing the rapid digital transformation of my home city, I became obsessed with the 'Smart City' concept. NUS offers the unique vantage point of being at the heart of this transformation...`,
+                color: '#EF7C00'
+            },
+            {
+                name: 'University of Tokyo',
+                location: 'Tokyo',
+                country: 'Япон',
+                rank: 12,
+                acceptance: '34%',
+                gpaReq: '3.5+',
+                satAvg: 'N/A',
+                majors: ['Нанотехнологи', 'Лингвистик', 'Олон улсын харилцаа'],
+                essayTitle: 'Reason for Application',
+                essay: `The intersection of tradition and innovation defines modern Japan. My fascination with Japanese linguistics began with learning Kanji, where I discovered that characters hold historical narratives within their strokes... <br><br>At Todai, I hope to research the cognitive effects of bilingualism in aging populations.`,
+                color: '#2C4B6B'
+            },
+            {
+                name: 'Tsinghua University',
+                location: 'Beijing',
+                country: 'Хятад',
+                rank: 13,
+                acceptance: '2.5%',
+                gpaReq: '3.8+',
+                satAvg: 'N/A',
+                majors: ['Инженерчлэл', 'Компьютерийн ухаан', 'Физик'],
+                essayTitle: 'Future Tech',
+                essay: `The rapid advancement of AI in China is not just a technological phenomenon, but a societal one. My goal is to bridge the gap between ethical AI development and industrial application... <br><br>Tsinghua’s proximity to the Zhongguancun tech hub offers unparalleled opportunities for internships and research.`,
+                color: '#8B0020'
+            },
+            {
+                name: 'Peking University',
+                location: 'Beijing',
+                country: 'Хятад',
+                rank: 14,
+                acceptance: '1%',
+                gpaReq: '3.8+',
+                satAvg: 'N/A',
+                majors: ['Хууль', 'Эдийн засаг', 'Философ'],
+                essayTitle: 'Cultural Heritage',
+                essay: `Understanding the past is crucial for navigating the future. Studying the economic reforms of the late 20th century in China provides a blueprint for developing nations... <br><br>Peking University’s rich history of intellectual discourse makes it the ideal place for my studies in political economy.`,
+                color: '#8B0000'
+            },
+            {
+                name: 'University of Chicago',
+                location: 'Chicago, IL',
+                country: 'АНУ',
+                rank: 15,
+                acceptance: '6.5%',
+                gpaReq: '3.9+',
+                satAvg: '1520',
+                majors: ['Эдийн засаг', 'Социологи', 'Математик'],
+                essayTitle: 'Uncommon Essay',
+                essay: `Where are the socks? It sounds absurd, but this question represents my fascination with entropy and disorder. A mismatched sock isn't just a laundry error; it's a statistical probability... <br><br>UChicago’s intellectual rigor and quirky traditions make it the perfect environment for someone who asks questions others might find strange.`,
+                color: '#800000'
+            },
+            {
+                name: 'Caltech',
+                location: 'Pasadena, CA',
+                country: 'АНУ',
+                rank: 16,
+                acceptance: '2.7%',
+                gpaReq: '3.9+',
+                satAvg: '1560',
+                majors: ['Физик', 'Хим', 'Биологи', 'Аэроспейс'],
+                essayTitle: 'Scientific Curiosity',
+                essay: `I don't just want to study physics; I want to touch it. Building a particle detector in my garage wasn't part of the curriculum, but it taught me more about error analysis than any textbook... <br><br>Caltech’s emphasis on hands-on research aligns perfectly with my approach to learning.`,
+                color: '#FF6C2C'
+            },
+            {
+                name: 'UCL (University College London)',
+                location: 'London',
+                country: 'Их Британи',
+                rank: 17,
+                acceptance: '16%',
+                gpaReq: '3.6+',
+                satAvg: 'N/A',
+                majors: ['Барилга архитектур', 'Анагаах ухаан', 'Боловсрол'],
+                essayTitle: 'Global Citizen',
+                essay: `Living in London means living in a crossroads of cultures. My interest in urban planning stems from a desire to create spaces that foster community in increasingly isolated societies... <br><br>UCL’s progressive history and central location make it the best place to study the future of urban living.`,
+                color: '#002145'
+            },
+            {
+                name: 'Imperial College London',
+                location: 'London',
+                country: 'Их Британи',
+                rank: 18,
+                acceptance: '14%',
+                gpaReq: '3.7+',
+                satAvg: 'N/A',
+                majors: ['Инженерчлэл', 'Физик', 'Бизнес'],
+                essayTitle: 'Science for Humanity',
+                essay: `Engineering is the art of solving problems that matter. My project designing low-cost water filters for rural communities taught me that functionality must meet affordability... <br><br>Imperial’s focus on STEM for the benefit of society matches my professional ambition.`,
+                color: '#003E74'
+            },
+            {
+                name: 'UCLA',
+                location: 'Los Angeles, CA',
+                country: 'АНУ',
+                rank: 19,
+                acceptance: '8.8%',
+                gpaReq: '3.7+',
+                satAvg: '1490',
+                majors: ['Кино урлаг', 'Сэтгэл судлал', 'Бизнес'],
+                essayTitle: 'Creative Expression',
+                essay: `The line between art and science is blurrier than we think. Coding a website uses structure and logic, but designing it requires an artistic eye... <br><br>UCLA’s vibrant arts community combined with strong STEM departments allows me to pursue both passions without compromise.`,
+                color: '#2774AE'
+            },
+            {
+                name: 'Cornell University',
+                location: 'Ithaca, NY',
+                country: 'АНУ',
+                rank: 20,
+                acceptance: '10.9%',
+                gpaReq: '3.8+',
+                satAvg: '1480',
+                majors: ['Хүнсний технологийн инженер', 'Агаарын инженерчлэл', 'Хууль'],
+                essayTitle: 'Any Person... Any Study',
+                essay: `Ezra Cornell’s vision of an institution where "any person can find instruction in any study" resonates with my interdisciplinary path. I want to combine agricultural science with economics to address food security... <br><br>The natural beauty of Ithaca provides the serenity needed for deep academic focus.`,
+                color: '#B31B1B'
+            }
+        ];
+
+        // Render University Cards
+        function renderUniversities() {
+            const grid = document.getElementById('uni-grid');
+            grid.innerHTML = '';
+
+            universities.forEach((uni, index) => {
+                const card = document.createElement('div');
+                card.className = 'reflective-card p-8 flex flex-col justify-between reveal group cursor-pointer';
+                card.style.transitionDelay = `${index * 0.05}s`;
+                card.onclick = () => openUniModal(uni);
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-mono text-accent tracking-widest">#${uni.rank}</span>
+                            <span class="text-xs text-muted">${uni.country}</span>
+                        </div>
+                        <h3 class="font-display text-2xl text-white group-hover:text-accent transition-colors duration-300 leading-tight">${uni.name}</h3>
+                        <p class="text-sm text-muted mt-2">${uni.location}</p>
+                    </div>
+                    
+                    <div class="mt-8 grid grid-cols-2 gap-4 text-sm border-t border-border/50 pt-6">
+                        <div>
+                            <div class="text-muted text-xs mb-1">Acceptance</div>
+                            <div class="text-white font-medium">${uni.acceptance}</div>
+                        </div>
+                        <div>
+                            <div class="text-muted text-xs mb-1">GPA</div>
+                            <div class="text-white font-medium">${uni.gpaReq}</div>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+            
+            // Re-trigger reveal observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // Modal Logic
+        function openUniModal(uni) {
+            const modal = document.getElementById('uni-modal');
+            
+            document.getElementById('modal-logo').innerHTML = `<span class="text-3xl font-display" style="color: ${uni.color}">${uni.name.charAt(0)}</span>`;
+            document.getElementById('modal-name').textContent = uni.name;
+            document.getElementById('modal-location').textContent = uni.location;
+            document.getElementById('modal-rank').textContent = `Дэлхийд #${uni.rank}`;
+            document.getElementById('modal-acceptance').textContent = `Элсэлт: ${uni.acceptance}`;
+            document.getElementById('modal-country').textContent = `${uni.location}, ${uni.country}`;
+            document.getElementById('modal-gpa').textContent = uni.gpaReq;
+            document.getElementById('modal-sat').textContent = uni.satAvg;
+            
+            // Essay
+            document.getElementById('modal-essay').innerHTML = `<strong class="text-accent not-italic">${uni.essayTitle}</strong><br><br>${uni.essay}`;
+            
+            // Majors
+            document.getElementById('modal-majors').innerHTML = uni.majors.map(m => `<span class="px-3 py-1 bg-white/5 border border-border rounded text-xs text-muted">${m}</span>`).join('');
+            
+            // Reset Calculator
+            document.getElementById('calc-input-gpa').value = '';
+            document.getElementById('calc-input-sat').value = '';
+            document.getElementById('modal-result').classList.add('hidden');
+            
+            toggleUniModal(true);
+        }
+
+        function calculateModalChance() {
+            const gpa = parseFloat(document.getElementById('calc-input-gpa').value) || 0;
+            const sat = parseInt(document.getElementById('calc-input-sat').value) || 0;
+            
+            // Simple Mock Logic
+            let score = 50;
+            if (gpa >= 3.9) score += 30;
+            else if (gpa >= 3.7) score += 20;
+            else score += 10;
+            
+            if (sat >= 1500) score += 20;
+            else if (sat >= 1400) score += 10;
+
+            // Randomize slightly to make it feel real
+            score += Math.floor(Math.random() * 10) - 5;
+            score = Math.max(5, Math.min(score, 95));
+
+            document.getElementById('modal-result').classList.remove('hidden');
+            document.getElementById('modal-result-text').textContent = `${score}%`;
+        }
+
+        function toggleUniModal(isOpen) {
+            const modal = document.getElementById('uni-modal');
+            if (isOpen) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Auth Logic
+        function toggleAuthModal(isOpen) {
+            const modal = document.getElementById('auth-modal');
+            if (isOpen) {
+                modal.classList.add('active');
+            } else {
+                modal.classList.remove('active');
+                // Reset form state
+                document.getElementById('auth-success').classList.add('hidden');
+                document.querySelector('#auth-modal form').style.display = 'block';
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const form = e.target;
+            
+            // Simulate sending
+            form.style.display = 'none';
+            document.getElementById('auth-success').classList.remove('hidden');
+            
+            // Auto close
+            setTimeout(() => {
+                toggleAuthModal(false);
+            }, 3000);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', renderUniversities);
+    </script>
+</body>
+</html>
